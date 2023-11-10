@@ -1,2 +1,2 @@
-# supabase-oci
+# SUPABASE OCI
 supabase-oci
