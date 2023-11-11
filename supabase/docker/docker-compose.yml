@@ -398,7 +398,7 @@ services:
 
   vector:
     container_name: supabase-vector
-    image: timberio/vector:0.28.1-alpine
+    image: timberio/vector:0.34.0-debian
     healthcheck:
       test:
         [
@@ -410,11 +410,8 @@ services:
           "--spider",
           "http://vector:9001/health"
         ]
-      timeout: 5s
-      interval: 5s
+      timeout: 10s
+      interval: 60s
       retries: 3
     volumes:
-      
-      - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro
-
-    command: [ "--config", "etc/vector/vector.yaml" ]
+      - /var/run/docker.sock:/var/run/docker.sock
