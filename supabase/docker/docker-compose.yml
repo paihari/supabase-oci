@@ -414,7 +414,7 @@ services:
       interval: 5s
       retries: 3
     volumes:
-      - /vol/volumes/logs/vector.yml:/etc/vector/vector.yml:ro
+      
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro
 
-    command: [ "--config", "etc/vector/vector.yml" ]
+    command: [ "--config", "etc/vector/vector.yaml" ]
