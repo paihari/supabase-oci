@@ -8,18 +8,6 @@ name: supabase
 version: "3.8"
 services:
 
-  nginx:
-    image: 'jc21/nginx-proxy-manager:latest'
-    restart: unless-stopped
-    ports:
-      - '80:80'
-      - '81:81'
-      - '443:443'
-    volumes:
-      - /vol/nginx-data:/data
-      - /vol/nginx-letsencrypt:/etc/letsencrypt
-
-
   studio:
     container_name: supabase-studio
     image: supabase/studio:20231023-7e2cd92
@@ -84,7 +72,7 @@ services:
       DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
     volumes:
       # https://github.com/supabase/supabase/issues/12661
-      - /vol/volumes/api/kong.yml:/home/kong/temp.yml:ro
+      - ./volumes/api/kong.yml:/home/kong/temp.yml:ro
 
   auth:
     container_name: supabase-auth
@@ -263,7 +251,7 @@ services:
       IMGPROXY_USE_ETAG: "true"
       IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
     volumes:
-      - /vol/volumes/storage:/var/lib/storage:z
+      - ./volumes/storage:/var/lib/storage:z
 
   meta:
     container_name: supabase-meta
@@ -299,7 +287,7 @@ services:
       # TODO: Allow configuring VERIFY_JWT per function. This PR might help: https://github.com/supabase/cli/pull/786
       VERIFY_JWT: "${FUNCTIONS_VERIFY_JWT}"
     volumes:
-      - /vol/volumes/functions:/home/deno/functions:Z
+      - ./volumes/functions:/home/deno/functions:Z
     command:
       - start
       - --main-service
@@ -386,19 +374,19 @@ services:
       PGDATABASE: ${POSTGRES_DB}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - /vol/volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
+      - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
       # Must be superuser to create event trigger
-      - /vol/volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
+      - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
       # Must be superuser to alter reserved role
-      - /vol/volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
+      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
       # PGDATA directory is persisted between restarts
-      - /vol/volumes/db/data:/var/lib/postgresql/data:Z
+      - ./volumes/db/data:/var/lib/postgresql/data:Z
       # Changes required for Analytics support
-      - /vol/volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
+      - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
 
   vector:
     container_name: supabase-vector
-    image: timberio/vector:0.34.0-alpine
+    image: timberio/vector:0.28.1-alpine
     healthcheck:
       test:
         [
@@ -410,8 +398,11 @@ services:
           "--spider",
           "http://vector:9001/health"
         ]
-      timeout: 10s
-      interval: 60s
+      timeout: 5s
+      interval: 5s
       retries: 3
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro
+      - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro
+
+    command: [ "--config", "etc/vector/vector.yml" ]
