@@ -21,5 +21,6 @@ services:
       - '81:81'
       - '443:443'
     volumes:
-      - /vol/nginx-data:/data
-      - /vol/nginx-letsencrypt:/etc/letsencrypt
+      - ./nginx-data:/data
+      - ./nginx-letsencrypt:/etc/letsencrypt
+      - ./nginx-snippets:/snippets:ro

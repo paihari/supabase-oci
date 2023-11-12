@@ -8,6 +8,19 @@ name: supabase
 version: "3.8"
 services:
 
+  nginx:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    volumes:
+      - ./nginx-data:/data
+      - ./nginx-letsencrypt:/etc/letsencrypt
+      - ./nginx-snippets:/snippets:ro
+
+
   studio:
     container_name: supabase-studio
     image: supabase/studio:20231023-7e2cd92
