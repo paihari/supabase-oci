@@ -16,7 +16,7 @@ services:
       - '81:81'
       - '443:443'
     volumes:
-      - ./nginx-data:/data
+      - /vol/nginx-data:/data
       - ./nginx-letsencrypt:/etc/letsencrypt
       - ./nginx-snippets:/snippets:ro
 
@@ -248,7 +248,7 @@ services:
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:5001
     volumes:
-      - ./volumes/storage:/var/lib/storage:z
+      - /vol/volumes/storage:/var/lib/storage:z
 
   imgproxy:
     container_name: supabase-imgproxy
@@ -264,7 +264,7 @@ services:
       IMGPROXY_USE_ETAG: "true"
       IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
     volumes:
-      - ./volumes/storage:/var/lib/storage:z
+      - /vol/volumes/storage:/var/lib/storage:z
 
   meta:
     container_name: supabase-meta
@@ -393,7 +393,7 @@ services:
       # Must be superuser to alter reserved role
       - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
       # PGDATA directory is persisted between restarts
-      - ./volumes/db/data:/var/lib/postgresql/data:Z
+      - /vol/volumes/db/data:/var/lib/postgresql/data:Z
       # Changes required for Analytics support
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
 
